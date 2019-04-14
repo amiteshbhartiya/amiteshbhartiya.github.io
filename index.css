@@ -50,3 +50,10 @@
     border-radius: 5px;
     line-height: 100px;
 }
+
+#status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+     margin-bottom: 10px;
+}

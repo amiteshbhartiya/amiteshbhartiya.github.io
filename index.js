@@ -14,12 +14,19 @@
 * Winner needs to be decided and has to be flashed
 *
 * Extra points will be given for approaching the problem more creatively
-* 
+*
+*https://amiteshbhartiya.github.io/ 
 */
 
 const grid = [];
 const GRID_LENGTH = 3;
 let turn = 'X';
+let xIsNext = 'X';
+let stepTracker = 0;
+
+function gameOver(){
+    return GRID_LENGTH*GRID_LENGTH;
+}
 
 function initializeGrid() {
     for (let colIdx = 0;colIdx < GRID_LENGTH; colIdx++) {
@@ -42,10 +49,10 @@ function getRowBoxes(colIdx) {
             additionalClass = 'lightBackground'
         }
         const gridValue = grid[colIdx][rowIdx];
-        if(gridValue === 1) {
+        if(gridValue === 'X') {
             content = '<span class="cross">X</span>';
         }
-        else if (gridValue === 2) {
+        else if (gridValue === 'O') {
             content = '<span class="cross">O</span>';
         }
         rowDivs = rowDivs + '<div colIdx="'+ colIdx +'" rowIdx="' + rowIdx + '" class="box ' +
@@ -73,17 +80,80 @@ function renderMainGrid() {
 function onBoxClick() {
     var rowIdx = this.getAttribute("rowIdx");
     var colIdx = this.getAttribute("colIdx");
-    let newValue = 1;
-    grid[colIdx][rowIdx] = newValue;
+    
+    if (grid[colIdx][rowIdx] == 0) {
+        grid[colIdx][rowIdx] = xIsNext;
+        stepTracker ++;
+    
+    if(xIsNext == 'X') xIsNext = 'O';
+    else xIsNext = 'X';
+
     renderMainGrid();
     addClickHandlers();
+   }
 }
 
-function addClickHandlers() {
+function addClickHandlers() { 
     var boxes = document.getElementsByClassName("box");
     for (var idx = 0; idx < boxes.length; idx++) {
         boxes[idx].addEventListener('click', onBoxClick, false);
     }
+    playGame();
+}
+
+function playGame() {
+     const winner = calculateWinner(grid);
+    let status;
+//alert((stepTracker-1));
+    if (winner) {
+      status = 'Winner :  &nbsp<strong>Player ' + winner+'</strong>';
+      let gridDiv = document.getElementById("grid");
+      gridDiv.innerHTML = "<div class='cross  parentTop'> Congratulation</div>"
+   
+
+    } else {
+
+        status = 'Your Turn : &nbsp <strong> Player ' + xIsNext+ '</strong>';
+        if ((stepTracker) == gameOver()) {
+            if (confirm("Do you want to play again?") == true) {
+                location.reload(); 
+            } else {
+                let gridDiv = document.getElementById("grid");
+                gridDiv.innerHTML = "<div class='cross  parentTop'> Game Over </div>"
+                status = "Have a nice day!";
+            }
+      }
+    }
+    
+    const statusDiv = document.getElementById("status");
+    statusDiv.innerHTML = status;
+            
+}
+
+function calculateWinner() {
+
+  for (let row = 0; row < GRID_LENGTH; row++) {
+    for (let col = 0; col < GRID_LENGTH; col++) {  
+       
+        if (((grid[0][0] != 0) && ((grid[0][0] == grid[0][1]) && (grid[0][0] == grid[0][2]))) || 
+          ((grid[0][0] != 0) && ((grid[0][0] == grid[1][0]) && (grid[0][0] == grid[2][0]))) || 
+          ((grid[0][0] != 0) && ((grid[0][0] == grid[1][1]) && (grid[0][0] == grid[2][2]))) )  {
+           return grid[0][0];
+        
+        }else if (((grid[1][0] != 0) && ((grid[1][0] == grid[1][1]) && (grid[1][0] == grid[1][2]))) || 
+            ((grid[1][1] != 0) && ((grid[1][1] == grid[0][1]) && (grid[1][1] == grid[2][1]))) ||
+            ((grid[1][1] != 0) && ((grid[0][2] == grid[1][1]) && (grid[1][1] == grid[2][0]))))  {
+            return grid[1][1];
+        
+        }else if (((grid[2][0] != 0) && ((grid[2][0] == grid[2][1]) && (grid[2][0] == grid[2][2]))) || 
+            ((grid[2][2] != 0) && ((grid[0][2] == grid[2][2]) && (grid[1][2] == grid[2][2]))))  {
+            return grid[2][2];
+       
+        }
+    }
+ }
+
+  return null;
 }
 
 initializeGrid();
